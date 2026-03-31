@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Foods — NutriTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .import-wrap { max-width: 720px; margin: 0 auto; }
+        .import-wrap h2 { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+        .import-wrap .sub { color: var(--ink-3); font-size: 0.9rem; margin-bottom: 2rem; }
+
+        .drop-zone {
+            border: 2.5px dashed var(--border-2);
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--card);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--green);
+            background: var(--green-pale);
+        }
+        .drop-zone input[type=file] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+        }
+        .drop-icon { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
+        .drop-title { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-bottom: 0.35rem; }
+        .drop-sub { font-size: 0.85rem; color: var(--ink-3); }
+        .file-chosen { margin-top: 0.75rem; font-size: 0.85rem; font-weight: 600; color: var(--green-dark); }
+
+        .import-actions { display: flex; gap: 1rem; margin-top: 1.25rem; align-items: center; flex-wrap: wrap; }
+        .template-link { font-size: 0.85rem; color: var(--green-dark); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; border: none; background: none; font-family: var(--font-body); }
+        .template-link:hover { text-decoration: underline; }
+
+        .result-box { margin-top: 1.5rem; }
+        .result-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+        .result-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+        .stat-item { text-align: center; }
+        .stat-num { font-family: var(--font-display); font-size: 2rem; font-weight: 800; }
+        .stat-num.green { color: var(--green-dark); }
+        .stat-num.orange { color: #ea580c; }
+        .stat-num.red { color: var(--red); }
+        .stat-label { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.2rem; }
+
+        .col-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 1rem; }
+        .col-table th { text-align: left; padding: 0.5rem 0.6rem; background: var(--surface); font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); border-bottom: 1.5px solid var(--border); }
+        .col-table td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); color: var(--ink-2); }
+        .badge-req { background: #dcfce7; color: #166534; font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.45rem; border-radius: 99px; }
+        .badge-opt { background: var(--surface); color: var(--ink-3); font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.45rem; border-radius: 99px; border: 1px solid var(--border-2); }
+
+        .skipped-list { max-height: 200px; overflow-y: auto; margin-top: 0.75rem; }
+        .skipped-item { font-size: 0.8rem; color: var(--ink-3); padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo-wrap"><span class="logo-icon">🍎</span><span class="logo-text">NutriTrack</span></div>
+        <div class="nav-links">
+            <a href="/index.html">Dashboard</a>
+            <a href="/analytics.html">Analytics</a>
+            <a href="/profile.html">Profile</a>
+            <button id="logoutBtn" class="btn-logout">Sign out</button>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <div class="import-wrap">
+        <h2>Import Food Records</h2>
+        <p class="sub">Upload an Excel (.xlsx) or CSV file to bulk-add foods to the database. New records are inserted; existing food names are updated.</p>
+
+        <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+            <span class="drop-icon">📂</span>
+            <p class="drop-title">Drop your file here or click to browse</p>
+            <p class="drop-sub">Supports .xlsx, .xls, .csv — max 10 MB</p>
+            <p class="file-chosen" id="fileChosen" style="display:none"></p>
+        </div>
+
+        <div class="import-actions">
+            <button class="btn-primary" id="uploadBtn" disabled>Upload &amp; Import</button>
+            <button class="template-link" id="templateBtn">⬇ Download template (.xlsx)</button>
+        </div>
+
+        <div class="result-box" id="resultBox" style="display:none;"></div>
+
+        <div style="margin-top:2.5rem;">
+            <h3 class="section-title">Required &amp; Optional Columns</h3>
+            <table class="col-table">
+                <thead><tr><th>Column name</th><th>Required?</th><th>Description</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td><code>food_name</code></td><td><span class="badge-req">Required</span></td><td>Name of the food</td><td>Dal Makhani</td></tr>
+                    <tr><td><code>energy_kcal</code></td><td><span class="badge-req">Required</span></td><td>Calories per 100g</td><td>180</td></tr>
+                    <tr><td><code>protein_g</code></td><td><span class="badge-req">Required</span></td><td>Protein in grams (per 100g)</td><td>8</td></tr>
+                    <tr><td><code>carb_g</code></td><td><span class="badge-req">Required</span></td><td>Carbohydrates in grams</td><td>22</td></tr>
+                    <tr><td><code>fat_g</code></td><td><span class="badge-req">Required</span></td><td>Fat in grams</td><td>6</td></tr>
+                    <tr><td><code>fibre_g</code></td><td><span class="badge-opt">Optional</span></td><td>Dietary fibre</td><td>4</td></tr>
+                    <tr><td><code>sodium_mg</code></td><td><span class="badge-opt">Optional</span></td><td>Sodium in mg</td><td>320</td></tr>
+                    <tr><td><code>serving_unit</code></td><td><span class="badge-opt">Optional</span></td><td>Serving description</td><td>bowl</td></tr>
+                    <tr><td><code>unit_kcal</code></td><td><span class="badge-opt">Optional</span></td><td>Calories per serving</td><td>360</td></tr>
+                    <tr><td><code>unit_protein</code></td><td><span class="badge-opt">Optional</span></td><td>Protein per serving</td><td>16</td></tr>
+                    <tr><td><code>unit_carb</code></td><td><span class="badge-opt">Optional</span></td><td>Carbs per serving</td><td>44</td></tr>
+                    <tr><td><code>unit_fat</code></td><td><span class="badge-opt">Optional</span></td><td>Fat per serving</td><td>12</td></tr>
+                    <tr><td><code>image_url</code></td><td><span class="badge-opt">Optional</span></td><td>URL to food image</td><td>https://…</td></tr>
+                    <tr><td><code>food_code</code></td><td><span class="badge-opt">Optional</span></td><td>Your reference code</td><td>MY001</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:0.75rem;font-size:0.82rem;color:var(--ink-3)">Column names are flexible — aliases like <code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code> are also accepted.</p>
+        </div>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    if (!API.isLoggedIn()) { window.location.href = '/login.html'; return; }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        API.clearSession(); window.location.href = '/login.html';
+    });
+
+    const dropZone   = document.getElementById('dropZone');
+    const fileInput  = document.getElementById('fileInput');
+    const fileChosen = document.getElementById('fileChosen');
+    const uploadBtn  = document.getElementById('uploadBtn');
+    const resultBox  = document.getElementById('resultBox');
+    let selectedFile = null;
+
+    fileInput.addEventListener('change', () => {
+        selectedFile = fileInput.files[0];
+        if (selectedFile) {
+            fileChosen.textContent = `✓ ${selectedFile.name} (${(selectedFile.size/1024).toFixed(1)} KB)`;
+            fileChosen.style.display = 'block';
+            uploadBtn.disabled = false;
+        }
+    });
+
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault(); dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) { fileInput.files = e.dataTransfer.files; fileInput.dispatchEvent(new Event('change')); }
+    });
+
+    document.getElementById('templateBtn').addEventListener('click', () => API.import.downloadTemplate());
+
+    uploadBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading…';
+        resultBox.style.display = 'none';
+
+        const fd = new FormData();
+        fd.append('file', selectedFile);
+
+        try {
+            const result = await API.import.upload(fd);
+            showResult(result, null);
+        } catch (err) {
+            showResult(null, err.message);
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload & Import';
+        }
+    });
+
+    function showResult(result, error) {
+        resultBox.style.display = 'block';
+        if (error) {
+            resultBox.innerHTML = `
+                <div class="result-card">
+                    <div class="alert alert-danger"><span class="alert-icon">✕</span><span>${error}</span></div>
+                </div>`;
+            return;
+        }
+        const skippedHtml = result.skipped && result.skipped.length > 0
+            ? `<div style="margin-top:1rem">
+                <p style="font-size:0.82rem;font-weight:600;color:var(--ink-3);margin-bottom:0.4rem">Skipped rows</p>
+                <div class="skipped-list">
+                    ${result.skipped.map(s => `<div class="skipped-item">Row ${s.row || s.name}: ${s.reason}</div>`).join('')}
+                </div>
+              </div>` : '';
+
+        resultBox.innerHTML = `
+            <div class="result-card">
+                <div class="alert alert-success" style="margin-bottom:1.25rem">
+                    <span class="alert-icon">✓</span><span>${result.message}</span>
+                </div>
+                <div class="result-stats">
+                    <div class="stat-item"><div class="stat-num green">${result.inserted}</div><div class="stat-label">Inserted</div></div>
+                    <div class="stat-item"><div class="stat-num orange">${result.duplicates_updated || 0}</div><div class="stat-label">Updated</div></div>
+                    <div class="stat-item"><div class="stat-num red">${result.errors || 0}</div><div class="stat-label">Errors</div></div>
+                </div>
+                ${skippedHtml}
+            </div>`;
+    }
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.className = `toast show ${type}`;
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+});
+</script>
+</body>
+</html>

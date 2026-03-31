@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile — NutriTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo-wrap"><span class="logo-icon">🍎</span><span class="logo-text">NutriTrack</span></div>
+        <div class="nav-links">
+            <a href="/index.html">Dashboard</a>
+            <a href="/analytics.html">Analytics</a>
+            <a href="/profile.html" class="active">Profile</a>
+            <button id="logoutBtn" class="btn-logout">Sign out</button>
+        </div>
+    </div>
+</nav>
+<main class="container">
+    <section class="profile-section">
+        <h2>⚙️ Your Profile</h2>
+        <div class="profile-card">
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="profileName">Full Name</label>
+                    <input type="text" id="profileName" required placeholder="Your full name">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profileAge">Age</label>
+                        <input type="number" id="profileAge" required min="1" max="120" placeholder="Years">
+                    </div>
+                    <div class="form-group">
+                        <label for="profileGender">Gender</label>
+                        <select id="profileGender" required>
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profileHeight">Height (cm)</label>
+                        <input type="number" id="profileHeight" required min="50" max="250" step="0.1" placeholder="e.g. 170">
+                    </div>
+                    <div class="form-group">
+                        <label for="profileWeight">Weight (kg)</label>
+                        <input type="number" id="profileWeight" required min="20" max="300" step="0.1" placeholder="e.g. 70">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="activityLevel">Activity Level</label>
+                    <select id="activityLevel" required>
+                        <option value="sedentary">🪑 Sedentary — little or no exercise</option>
+                        <option value="light">🚶 Lightly active — 1–3 days/week</option>
+                        <option value="moderate">🏃 Moderately active — 3–5 days/week</option>
+                        <option value="active">🏋️ Very active — 6–7 days/week</option>
+                        <option value="very-active">⚡ Extra active — physical job or 2× training</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="goal">Health Goal</label>
+                    <select id="goal" required>
+                        <option value="maintain">⚖️ Maintain weight</option>
+                        <option value="lose">📉 Lose weight</option>
+                        <option value="gain">📈 Gain weight</option>
+                    </select>
+                </div>
+                <div class="bmi-display">
+                    <h4>BMI: <span id="bmiValue">—</span></h4>
+                    <p class="bmi-category" id="bmiCategory"></p>
+                </div>
+                <div class="calorie-recommendation">
+                    <h4>🎯 Recommended Daily Calories: <span id="recommendedCalories">—</span> kcal</h4>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Save Profile &amp; Go to Dashboard →</button>
+            </form>
+        </div>
+    </section>
+</main>
+<script src="/js/api.js"></script>
+<script src="/js/profile.js"></script>
+</body>
+</html>

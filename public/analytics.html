@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics — NutriTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo-wrap"><span class="logo-icon">🍎</span><span class="logo-text">NutriTrack</span></div>
+        <div class="nav-links">
+            <a href="/index.html">Dashboard</a>
+            <a href="/analytics.html" class="active">Analytics</a>
+            <a href="/profile.html">Profile</a>
+            <button id="logoutBtn" class="btn-logout">Sign out</button>
+        </div>
+    </div>
+</nav>
+<main class="container">
+    <section class="analytics-section">
+        <h2>📊 Nutrition Analytics</h2>
+        <div class="summary-cards">
+            <div class="summary-card">
+                <h4>🔥 Avg Daily Calories</h4>
+                <p class="summary-value" id="avgCalories">—</p>
+                <p class="summary-label">kcal / day</p>
+            </div>
+            <div class="summary-card">
+                <h4>💪 Avg Daily Protein</h4>
+                <p class="summary-value" id="avgProtein">—</p>
+                <p class="summary-label">g / day</p>
+            </div>
+            <div class="summary-card">
+                <h4>🌾 Avg Daily Carbs</h4>
+                <p class="summary-value" id="avgCarbs">—</p>
+                <p class="summary-label">g / day</p>
+            </div>
+            <div class="summary-card">
+                <h4>🥑 Avg Daily Fats</h4>
+                <p class="summary-value" id="avgFats">—</p>
+                <p class="summary-label">g / day</p>
+            </div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>🔥 Daily Calorie Trend</h3>
+                <canvas id="caloriesChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🥗 Macronutrient Split</h3>
+                <canvas id="macroChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card full-width">
+            <h3>📅 Weekly Nutrition Breakdown</h3>
+            <canvas id="weeklyChart"></canvas>
+        </div>
+        <div class="chart-card full-width">
+            <h3>💡 Weekly Insights</h3>
+            <div id="insightsContent"><p style="color:var(--ink-4);font-size:0.9rem">Loading insights…</p></div>
+        </div>
+    </section>
+</main>
+<script src="/js/api.js"></script>
+<script src="/js/analytics.js"></script>
+</body>
+</html>

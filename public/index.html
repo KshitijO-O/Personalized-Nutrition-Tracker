@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — NutriTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo-wrap">
+            <span class="logo-icon">🍎</span>
+            <span class="logo-text">NutriTrack</span>
+        </div>
+        <div class="nav-links">
+            <a href="/index.html" class="active">Dashboard</a>
+            <a href="/analytics.html">Analytics</a>
+            <a href="/profile.html">Profile</a>
+            <button id="logoutBtn" class="btn-logout">Sign out</button>
+        </div>
+    </div>
+</nav>
+<main class="container">
+
+    <section class="welcome-section">
+        <div class="welcome-text">
+            <h2>Good day, <span id="userName">User</span> 👋</h2>
+            <p class="date-display" id="currentDate"></p>
+        </div>
+        <div class="streak-badge">
+            <span class="streak-icon">🔥</span>
+            <span class="streak-label" id="streakLabel">0 day streak</span>
+        </div>
+    </section>
+    <div id="alertContainer" class="alert-container"></div>
+
+    <section class="goals-section">
+        <h3 class="section-title">Today's Goals</h3>
+        <div class="goals-grid">
+            <div class="goal-card">
+                <div class="goal-header"><span class="goal-label">Calories</span><span class="goal-icon">🔥</span></div>
+                <div class="progress-info">
+                    <span class="consumed" id="caloriesConsumed">0</span>
+                    <span class="separator">/</span>
+                    <span class="target" id="caloriesTarget">2000</span>
+                    <span class="unit">kcal</span>
+                </div>
+                <div class="progress-track"><div id="caloriesProgress" class="progress-fill cal-fill"></div></div>
+                <div class="remaining" id="caloriesRemaining">2000 kcal remaining</div>
+            </div>
+            <div class="goal-card">
+                <div class="goal-header"><span class="goal-label">Protein</span><span class="goal-icon">💪</span></div>
+                <div class="progress-info">
+                    <span class="consumed" id="proteinConsumed">0</span>
+                    <span class="separator">/</span>
+                    <span class="target" id="proteinTarget">150</span>
+                    <span class="unit">g</span>
+                </div>
+                <div class="progress-track"><div id="proteinProgress" class="progress-fill prot-fill"></div></div>
+                <div class="remaining" id="proteinRemaining">150g remaining</div>
+            </div>
+            <div class="goal-card">
+                <div class="goal-header"><span class="goal-label">Carbs</span><span class="goal-icon">🌾</span></div>
+                <div class="progress-info">
+                    <span class="consumed" id="carbsConsumed">0</span>
+                    <span class="separator">/</span>
+                    <span class="target" id="carbsTarget">250</span>
+                    <span class="unit">g</span>
+                </div>
+                <div class="progress-track"><div id="carbsProgress" class="progress-fill carb-fill"></div></div>
+                <div class="remaining" id="carbsRemaining">250g remaining</div>
+            </div>
+            <div class="goal-card">
+                <div class="goal-header"><span class="goal-label">Fats</span><span class="goal-icon">🥑</span></div>
+                <div class="progress-info">
+                    <span class="consumed" id="fatsConsumed">0</span>
+                    <span class="separator">/</span>
+                    <span class="target" id="fatsTarget">65</span>
+                    <span class="unit">g</span>
+                </div>
+                <div class="progress-track"><div id="fatsProgress" class="progress-fill fat-fill"></div></div>
+                <div class="remaining" id="fatsRemaining">65g remaining</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="food-log-section">
+        <div class="section-header">
+            <h3 class="section-title" style="margin:0">Log Your Food</h3>
+            <button class="btn-add" id="addFoodBtn"><span>＋</span> Add Food</button>
+        </div>
+
+        <div class="food-panel" id="foodPanel" style="display:none;">
+            <div class="food-panel-top">
+                <div class="search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchFood" placeholder="Search 1000+ Indian foods…" class="search-input">
+                </div>
+                <button class="filter-btn" id="filterToggle">⚙️ Filter</button>
+            </div>
+
+            <div class="filter-panel" id="filterPanel" style="display:none;">
+                <div class="filter-group">
+                    <p class="filter-title">Max Calories</p>
+                    <input type="range" id="filterCalorie" min="0" max="900" step="50" value="900">
+                    <p class="filter-val">Up to <span id="filterCalorieVal">900</span> kcal</p>
+                </div>
+                <div class="filter-group">
+                    <p class="filter-title">Min Protein</p>
+                    <input type="range" id="filterProtein" min="0" max="50" step="1" value="0">
+                    <p class="filter-val">At least <span id="filterProteinVal">0</span>g</p>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn-filter-save" id="filterSave">Apply</button>
+                    <button class="btn-filter-reset" id="filterReset">Reset</button>
+                </div>
+            </div>
+
+            <div class="food-grid-wrap">
+                <div class="food-grid" id="foodGrid">
+                    <div class="empty-state" style="grid-column:1/-1">⏳ Loading foods…</div>
+                </div>
+                <div class="grid-footer">
+                    <span>Showing <strong id="totalItems">0</strong> items</span>
+                    <button class="cart-btn" id="cartBtn">🛒 View Cart <span class="cart-count" id="cartCount">0</span></button>
+                </div>
+            </div>
+
+            <div class="cart-panel" id="cartPanel" style="display:none;">
+                <h4 class="cart-title">🛒 Cart — Review Before Logging</h4>
+                <div class="cart-table-wrap">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Food Item</th>
+                                <th>Qty</th>
+                                <th>🔥 Calories</th>
+                                <th>💪 Protein</th>
+                                <th>🌾 Carbs</th>
+                                <th>🥑 Fat</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartTableBody"></tbody>
+                        <tfoot id="cartTableFoot"></tfoot>
+                    </table>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn-secondary" id="addMoreBtn">＋ Add More Items</button>
+                    <button class="btn-danger" id="clearCartBtn">🗑️ Clear All</button>
+                    <button class="btn-primary" id="confirmLogBtn">✔ Confirm &amp; Log</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="foodList" class="food-list">
+            <div class="empty-state">
+                <span class="empty-state-icon">🍽️</span>
+                No foods logged yet. Click "Add Food" to get started.
+            </div>
+        </div>
+    </section>
+
+    <section class="recommendation-section" id="recommendationSection" style="display:none;">
+        <h3 class="section-title">💡 Smart Recommendations</h3>
+        <div id="recommendationContent" class="rec-grid"></div>
+    </section>
+
+</main>
+
+<div class="food-info-modal" id="foodModal" style="display:none;">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-card">
+        <button class="modal-close" id="modalClose">✕</button>
+        <div id="modalHero"></div>
+        <div class="modal-body">
+            <h3 id="modalName"></h3>
+            <span id="modalType" class="modal-type-badge"></span>
+            <div class="modal-nutrients">
+                <div class="nutrient-row"><span>🔥 Calories</span><strong id="modalCalories"></strong></div>
+                <div class="nutrient-row"><span>💪 Protein</span><strong id="modalProtein"></strong></div>
+                <div class="nutrient-row"><span>🌾 Carbs</span><strong id="modalCarbs"></strong></div>
+                <div class="nutrient-row"><span>🥑 Fats</span><strong id="modalFats"></strong></div>
+            </div>
+            <button class="btn-primary btn-full" id="modalAddBtn">＋ Add to Cart</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>
