@@ -42,8 +42,6 @@ http://localhost:3000
 ---
 
 ## Notes
-
-* Do not upload your `.env` file
 * Make sure MySQL service is running before setup
 * To reset food data:
   Delete all rows from `food_items` and run setup again
